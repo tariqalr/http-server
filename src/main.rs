@@ -1,5 +1,6 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
+use std::fs;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:3708").unwrap();
@@ -21,6 +22,13 @@ fn handle_connection(mut stream: TcpStream) {
 
 	println!("Request: {http_request:#?}");
 
-	let response = "HTTP/1.1 200 OK\r\n\r\n";
-	stream.write_all(response.as_bytes()).unwrap();
+	if http_request.first().unwrap() == "GET / HTTP/1.1" {
+		let contents = fs::read_to_string("src/htdocs/index.html").unwrap();
+		let response = format!("HTTP/1.1 200 OK\r\n\r\nContent-Length: {}\r\n\r\n{contents}",contents.len());
+		stream.write_all(response.as_bytes()).unwrap();
+	} else {
+		let response = "HTTP/1.1 404 Not Found";
+		stream.write_all(response.as_bytes()).unwrap();
+	}
+
 }
