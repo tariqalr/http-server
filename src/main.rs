@@ -3,13 +3,18 @@ use std::{
 	io::{prelude::*, BufReader},
 	fs,
 };
+use http_server::ThreadPool;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:3708").unwrap();
+	let pool = ThreadPool::new(4);
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
-		handle_connection(stream);
+
+		pool.execute(|| {
+			handle_connection(stream);
+		});
     }
 }
 
@@ -39,7 +44,7 @@ fn handle_connection(mut stream: TcpStream) {
 
 	let response = if !file.is_empty() {
 		let contents = fs::read_to_string(file).unwrap();
-		&format!("{status}\r\n\r\nContent-Length: {}\r\n\r\n{contents}",contents.len())
+		&format!("{status}\r\nContent-Length: {}\r\nContent-Type: text/html; charset=utf-8\r\n\r\n{contents}",contents.len())
 	} else {
 		status
 	};
