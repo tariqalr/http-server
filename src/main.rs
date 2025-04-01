@@ -78,7 +78,7 @@ fn handle_connection(mut stream: TcpStream) {
 		},
 		"image/jpeg" => {
 			match fs::read(filepath) {
-				Ok(contents) => Response::Binary([format!("{status}\r\nContent-Length: {}\r\nContent-Type: {content_type}; charset=utf-8\r\n\r\n",contents.len()).into_bytes(), contents].concat()),
+				Ok(contents) => Response::Binary([format!("{status}\r\nContent-Length: {}\r\nContent-Type: {content_type}\r\n\r\n",contents.len()).into_bytes(), contents].concat()),
 				Err(_) => Response::InternalError,
 			}
 		},
