@@ -7,7 +7,10 @@ use std::{
 use http_server::ThreadPool;
 
 fn main() {
-    let listener = TcpListener::bind("127.0.0.1:3708").expect("Could not bind to port");
+	const IP: &str = "0.0.0.0";
+	const PORT: &str = "3708";
+    let listener = TcpListener::bind(format!("{IP}:{PORT}")).expect("Could not bind to port");
+	
 	let pool = ThreadPool::new(4);
 
     for stream in listener.incoming() {
